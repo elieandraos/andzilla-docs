@@ -120,16 +120,48 @@
 
 <p>In this guide, we will discuss how to install Laravel on Ubuntu 14.04. We will be using Nginx as our web server and will be working with the most recent version of Laravel at the time of this writing, version 5.2.</p>
 
-<h1 id="authentication">Authentication</h1>
+<h1 id="create-droplet">Create Droplet</h1>
 
-<blockquote>
-<p>To authenticate via ssh, use this code:</p>
-</blockquote>
-<pre class="highlight shell"><code>ssh user@ip
-
+<p><b><u>After you create your droplet</b></u>, you need to create an <b>ssh key</b> for the <b>root user</b>, to avoid brute force attacks and password guessing.</p>
+<pre class="highlight shell"><code><span class="c">#on your local machine</span>
+ssh-keygen -t rsa 
+<span class="c">#usually located in /Users/Elie/.ssh/ and named 'id_rsa' , press enter to keep location</span>
+<span class="c">#you will be prompted for a ssh key password, always remember it (lynn662625)</span>
 </code></pre>
 
-<p>replace the user and ip upon the configuration.</p>
+<p>Then you need to copy the public key <b>id_rsa.pub</b> and add it to your server authorized keys.</p>
+<pre class="highlight shell"><code>sudo vi /Users/Elie/.ssh/id_rsa.pub
+<span class="c">#copy all the code generated</span>
+<span class="c">#go to your server and authenticate (you will be prompted to change your root password first time)</span>
+<span class="nb">cd</span> ~
+<span class="nb">cd</span> .ssh/
+vi authorized_keys
+<span class="c">#paste the key of id_rsa.pub</span>
+</code></pre>
+
+<p>After you ensured login with the rsa key, we need to <b>remove the root password</b> and 
+restrict the root login to only be permitted via SSH keys.</p>
+<pre class="highlight shell"><code>sudo vi /etc/ssh/sshd_config
+<span class="c">#change PermitRootLogin value to without-password</span>
+PermitRootLogin without-password
+reload ssh
+</code></pre>
+
+<h1 id="adding-user-on-server">Adding user on server</h1>
+
+<p>It&rsquo;s not recommended to work with the root user on server, so let&rsquo;s create a new user and give it sudo persmissions.</p>
+<pre class="highlight shell"><code>adduser elie
+<span class="c">#you will be prompted for a password</span>
+adduser elie sudo <span class="c">#add it to the sudo group</span>
+</code></pre>
+
+<p>If you need to also enable the rsa key login for the created user. </p>
+<pre class="highlight shell"><code><span class="nb">cd</span> ~
+mkdir .ssh
+sudo vi .ssh/authorized_keys
+
+<span class="c">#add your id_rsa.pub key</span>
+</code></pre>
 
 <h1 id="install-git">Install GIT</h1>
 <pre class="highlight shell"><code>sudo apt-get install git
