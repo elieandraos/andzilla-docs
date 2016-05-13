@@ -179,7 +179,7 @@ sudo vi .ssh/authorized_keys
 </blockquote>
 <pre class="highlight shell"><code>sudo apt-get update
 sudo apt-get install python-software-properties
-sudo add-apt-repository ppa:ondrej/php5-5.6
+sudo <span class="nv">LC_ALL</span><span class="o">=</span>C.UTF-8 add-apt-repository ppa:ondrej/php
 sudo apt-get update
 </code></pre>
 
@@ -355,7 +355,7 @@ server <span class="o">{</span>
 <blockquote>
 <p>Restart server</p>
 </blockquote>
-<pre class="highlight shell"><code>sudo /etc/init.d/nginx retart
+<pre class="highlight shell"><code>sudo /etc/init.d/nginx restart
 </code></pre>
 
 <h1 id="laravel-configuration">Laravel Configuration</h1>
@@ -392,6 +392,50 @@ sudo service php5-fpm reload
 sudo service nginx reload
 
 </code></pre>
+
+<h1 id="phpmyadmin-installation">PhpMyAdmin Installation</h1>
+
+<p>To install phpmyadmin, follow these steps:</p>
+<pre class="highlight shell"><code>sudo apt-get install phpmyadmin
+<span class="c">#it will ask you which websever you would like to configure</span>
+<span class="c">#since nginx is not listed just press TAB</span>
+<span class="c">#the next prompt about dbconfig-common press YES</span>
+sudo ln -s /usr/share/phpmyadmin /usr/share/nginx/html
+sudo php5enmod mcrypt
+sudo service php5-fpm restart
+</code></pre>
+
+<p>Last step, open the default file in in sites-available and paste the following, 
+then recreate the symlink in sites enabled</p>
+
+<blockquote>
+<p>default file in sites-available</p>
+</blockquote>
+<pre class="highlight shell"><code>location /phpmyadmin <span class="o">{</span>
+    root /usr/share/;
+    index index.php;
+
+    location ~ ^/phpmyadmin/<span class="o">(</span>.+<span class="se">\.</span>php<span class="o">)</span><span class="nv">$ </span><span class="o">{</span>
+            try_files <span class="nv">$uri</span> <span class="o">=</span>404;
+            root /usr/share/;
+            fastcgi_pass unix:/var/run/php5-fpm.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME <span class="nv">$document_root$fastcgi_script_name</span>;
+            include fastcgi_params;
+    <span class="o">}</span>
+
+    location ~<span class="k">*</span> ^/phpmyadmin/<span class="o">(</span>.+<span class="se">\.</span><span class="o">(</span>jpg|jpeg|gif|css|png|js|ico|html|xml|txt<span class="o">))</span><span class="nv">$ </span><span class="o">{</span>
+            root /usr/share;
+    <span class="o">}</span>
+<span class="o">}</span>
+
+location /phpMyAdmin
+<span class="o">{</span>
+    rewrite ^/<span class="k">*</span> /phpmyadmin last;
+<span class="o">}</span>
+</code></pre>
+
+<p>Go to <code class="prettyprint">http://server_domain_or_IP/phpmyadmin</code></p>
 
       </div>
       <div class="dark-box">
