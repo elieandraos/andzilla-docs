@@ -437,6 +437,46 @@ location /phpMyAdmin
 
 <p>Go to <code class="prettyprint">http://server_domain_or_IP/phpmyadmin</code></p>
 
+<h1 id="remote-mysql">Remote MySQL</h1>
+
+<p>By default, MySQL only listens for connections on localhost, so the first step is to reconfigure MySQL on your database server to listen on all interfaces. To do this, log in to your server as root and edit the file.</p>
+<pre class="highlight shell"><code>sudo vi /etc/mysql/my.cnf
+<span class="c"># comment out bind-address</span>
+<span class="c">#bind-address = 127.0.0.1</span>
+sudo service mysql restart
+</code></pre>
+
+<p>However, allowing direct access to MySQL increases the risk of your server being compromised by attackers.
+Therefore the need of ubuntu firewall. </p>
+
+<h1 id="ubuntu-firewall">Ubuntu Firewall</h1>
+
+<p>UFW is installed by default on Ubuntu. If it has been uninstalled for some reason, you can install it </p>
+<pre class="highlight shell"><code>sudo apt-get install ufw
+sudo ufw status verbose
+</code></pre>
+
+<p>By default, UFW is disabled so you should see something like this: <code class="prettyprint">status: inactive</code></p>
+<pre class="highlight shell"><code>sudo ufw allow ssh <span class="c">#allow ssh connections</span>
+sudo ufw allow 80 <span class="c">#allow http connections</span>
+sudo ufw allow ftp <span class="c">#allow ftp</span>
+sudo ufw allow from 15.15.15.51 <span class="c">#allow specific ip</span>
+sudo ufw deny from 15.15.15.51 <span class="c">#deny specific ip</span>
+</code></pre>
+
+<blockquote>
+<p>Deleting a rule</p>
+</blockquote>
+<pre class="highlight shell"><code>sudo ufw status numbered
+sudo ufw delete 2 <span class="c"># 2 is the number of the rule</span>
+</code></pre>
+
+<blockquote>
+<p>Enable ufw</p>
+</blockquote>
+<pre class="highlight shell"><code>sudo ufw disable
+</code></pre>
+
       </div>
       <div class="dark-box">
           <div class="lang-selector">
